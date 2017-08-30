@@ -1,0 +1,20 @@
+apply plugin: "groovy"
+
+group = "ru.ftc.cs.test"
+version = "1.0.0"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "http://diesel.ftc.ru:8080/nexus/content/groups/public/" }
+}
+
+dependencies {
+
+    testCompile group: "org.codehaus.groovy"                      , name: "groovy-all"  , version: "2.4.5"
+    testCompile group: "org.codehaus.groovy.modules.http-builder" , name: "http-builder", version: "0.7.1"
+    testCompile group: "org.spockframework"                       , name: "spock-core"  , version: "1.0-groovy-2.4"
+}
