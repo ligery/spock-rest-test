@@ -51,7 +51,19 @@ class TranslatorClientTest extends TranslatorSpec {
         translatorClient.call(detect, [text: word]) == [code:200, lang: ""]
 
         where:
-        word << ["12", '.']
+        word << ["12", '.', 'check']
+    }
+
+    @Unroll
+    def "translate #word from #lang1 to #lang2"(){
+        expect:
+        translatorClient.call(translate, [text: word, lang: lang1.name() + "-" + lang2.name()])
+
+        where:
+        word        | lang1     | lang2
+        "Hello"     | en        | ru
+        "Hello"     | ru        | en
+        "Hello"     | en        | en
     }
 
 
