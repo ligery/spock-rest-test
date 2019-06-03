@@ -16,7 +16,7 @@ class TranslatorRestTest extends TranslatorSpec {
 
         then:
         HttpResponseException exception = thrown()
-        exception.response.status == 403
+        exception.response.status == 400
         exception.response.data  == [code: 401, message: "API key is invalid"]
     }
 

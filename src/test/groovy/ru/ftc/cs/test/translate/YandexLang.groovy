@@ -7,4 +7,6 @@ enum YandexLang {
     fr,
     ru,
     uk,
+    az,
+    ba
 }
