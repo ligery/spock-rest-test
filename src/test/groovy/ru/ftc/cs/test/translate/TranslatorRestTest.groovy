@@ -10,16 +10,27 @@ import static ru.ftc.cs.test.translate.YandexLang.*
  */
 class TranslatorRestTest extends TranslatorSpec {
 
-    def "Permission Denied: Missing API Key"(){
+    def "translator Permission Denied: Missing API Key"(){
         when:
         restClient.get(path: "getLangs")
 
         then:
         HttpResponseException exception = thrown()
         exception.response.status == 400
-        exception.response.data  == [code: 401, message: "API key is invalid"]
+        exception.response.data  == [code: 502, message: "Invalid parameter: key"]
     }
 
+    def "translator Permission Denied: API Key is blocked"(){
+        when:
+        restClient.get(path: "getLangs", query: [key: BLOCKED_API_KEY])
+
+        then:
+        HttpResponseException exception = thrown()
+        exception.response.status == 403
+        exception.response.data  == [code: 402, message: "API key is blocked"]
+    }
+
+    @Unroll
     def "getLangs API"(){
         when:
         def result = restClient.get([path: 'getLangs', query: [key: API_KEY, ui: ru.name()]])
@@ -28,6 +39,14 @@ class TranslatorRestTest extends TranslatorSpec {
         result.data.size() == 2
         result.data.dirs.size() == 160
         result.data.langs.size() == 93
+
+        when:
+        def result1 = restClient.get([path: 'getLangs', query: [key: API_KEY, ui: 'russia']])
+
+        then:
+        result1.data.size() == 2
+        result1.data.dirs.size() == 160
+        result1.data.langs.size() == 93
     }
 
     @Unroll

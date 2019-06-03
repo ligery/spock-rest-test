@@ -32,22 +32,41 @@ class TranslatorClientTest extends TranslatorSpec {
     }
 
     @Unroll
-    def "detect Lang for #word: #lang"(){
+    def "detect Lang succesfully for #word: #lang"(){
         expect:
         translatorClient.call(detect, [text: word]) == [code: 200, lang: lang.name()]
 
         where:
         word        | lang
-        "Ананас"    | ru
-        "Gut"       | de
-        "Petit"     | en
-        "Bonjour"   | fr
-        "LLLL"      | es
-        "a1"        | en
+        'Ананас'    | ru
+        'Gut'       | de
+        'Bonjour'   | fr
+        'a1'        | en
     }
 
     @Unroll
-    def "Check correct lang format" (){
+    def "detect Lang assigned to en by default for #word"(){
+        expect:
+        translatorClient.call(detect, [text: word]) == [code: 200, lang: 'en']
+
+        where:
+        word  << ['a1', 'LLLL', 'sumword']
+    }
+
+    def "limit check"(){
+        when:
+        def result = restClient.get([path: 'translate', query: [key: API_KEY, lang: 'en-ru', text: word]])
+
+        then:
+        HttpResponseException exception = thrown()
+        exception.response.status == 414
+
+        where:
+        word = 'This string is too long for translation' * 1000
+    }
+
+    @Unroll
+    def "check 3 chars long lang format" (){
         when:
         def result = restClient.get([path: 'translate', query: [key: API_KEY, lang: lang, text: word]])
 
@@ -58,12 +77,13 @@ class TranslatorClientTest extends TranslatorSpec {
 
         where:
         word        | lang
-        "Яблоко"    | 'rus'
-        "Ананас"    | 'eng'
+        'Яблоко'    | 'rus'
+        'Ананас'    | 'eng'
+        'Kurwa'     | 'pol'
     }
 
     @Unroll
-    def "Check uncorrect lang format" (){
+    def "Check incorrect lang format #lang" (){
         when:
         def result = restClient.get([path: 'translate', query: [key: API_KEY, lang: lang, text: word]])
 
@@ -74,16 +94,32 @@ class TranslatorClientTest extends TranslatorSpec {
 
         where:
         word        | lang
-        "Пончик"    | 'motherrussia'
+        'Пончик'    | 'english'
+        'Person'    | 'en ru'
     }
 
     @Unroll
     def "detect Empty Lang for #word"(){
-        expect:
-        translatorClient.call(detect, [text: word]) == [code:200, lang: ""]
+        when:
+        def result = restClient.get([path: 'detect', query: [key: API_KEY, text: word]])
+
+        then:
+        result.data.lang == ""
 
         where:
-        word << ["12", '.', 'check']
+        word << ["12", '.']
+    }
+
+    @Unroll
+    def "detect Lang Succesfully for #word"(){
+        when:
+        def result = restClient.get([path: 'detect', query: [key: API_KEY, text: word]])
+
+        then:
+        result.data.lang != ''
+
+        where:
+        word << ['test', 'shevale','arbeit', 'n33t']
     }
 
     @Unroll
@@ -93,40 +129,40 @@ class TranslatorClientTest extends TranslatorSpec {
 
         where:
         word        | lang1     | lang2
-        "Hello"     | en        | ru
-        "Hello"     | en        | en
-        "LLL"       | en        | ru
-        "Hello"     | ru        | en
-        "Howdy"     | az        | ba
-
+        'Hello'     | en        | ru
+        'Hello'     | en        | en
+        'LLL'       | en        | ru
+        'Howdy'     | az        | ba
     }
 
     @Unroll
-    def "translate #word1 with #lang" (){
+    def "detect Correct Translation #word1 to #word2 with #lang" (){
         when:
         def result = restClient.get([path: 'translate', query: [key: API_KEY, lang: lang, text: word1]])
-
-        then:
-        result.data == [code:200, lang: lang, text: [word2]]
-
-        where:
-        word1        | lang         | word2
-        "Peach"      | 'en-ru'      | "Персик"
-        "Peach"      | 'en-en'      | "Персик"
-    }
-
-    @Unroll
-    def "translate #word1 to #lang" (){
-        when:
-        def result = restClient.get([path: 'translate', query: [key: API_KEY, text: word1, lang: lang.name(), options:1]])
 
         then:
         result.data.text[0] == word2
 
         where:
         word1        | lang         | word2
-        'Peach'      | ru           | 'Персик'
-        'Peach'      | en           | 'Персик'
+        'Peach'      | 'en-ru'      | 'Персик'
+        'Peach'      | 'en-en'      | 'Peach'
+        'Bonjour'    | 'fr-en'      | 'Hello'
+    }
+
+    @Unroll
+    def "detect correct translation #word1 to #lang" (){
+        when:
+        def result = restClient.get([path: 'translate', query: [key: API_KEY, text: word1, lang: lang.name()]])
+
+        then:
+        result.data.text[0] == word2
+
+        where:
+        word1           | lang         | word2
+        'Peach'         | ru           | 'Персик'
+        'Peach'         | en           | 'Peach'
+        'untr4nsl4t4bl3'| en           | 'untr4nsl4t4bl3'
     }
 
 
