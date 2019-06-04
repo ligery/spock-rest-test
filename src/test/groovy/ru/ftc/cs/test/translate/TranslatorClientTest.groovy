@@ -1,6 +1,5 @@
 package ru.ftc.cs.test.translate
 
-import groovy.transform.ToString
 import groovyx.net.http.HttpResponseException
 import spock.lang.Shared
 import spock.lang.Unroll
@@ -53,7 +52,6 @@ class TranslatorClientTest extends TranslatorSpec {
         word  << ['a1', 'LLLL', 'sumword']
     }
 
-    //TODO переделать на translatorClient
     def "query limit check"(){
         when:
         translatorClient.call(translate, [lang: 'en-ru', text: word])
@@ -66,7 +64,6 @@ class TranslatorClientTest extends TranslatorSpec {
         word = 'This string is too long for translation' * 1000
     }
 
-    //TODO переделать на translatorClient и добавить переменную в название
     @Unroll
     def "check 3 chars long lang format, lang: #lang" (){
         when:
@@ -84,7 +81,6 @@ class TranslatorClientTest extends TranslatorSpec {
         'Kurwa'     | 'pol'
     }
 
-    //TODO переделать на translatorClient
     @Unroll
     def "Check incorrect lang format #lang" (){
         when:
@@ -101,7 +97,6 @@ class TranslatorClientTest extends TranslatorSpec {
         'Person'    | 'en ru'
     }
 
-    //TODO переделать на translatorClient
     @Unroll
     def "detect Empty Lang for #word"(){
         when:
@@ -114,7 +109,6 @@ class TranslatorClientTest extends TranslatorSpec {
         word << ["12", '.']
     }
 
-    //TODO переделать на translatorClient
     @Unroll
     def "detect Lang Succesfully for #word"(){
         when:
@@ -140,7 +134,6 @@ class TranslatorClientTest extends TranslatorSpec {
         'Howdy'     | az        | ba
     }
 
-    //TODO переделать на translatorClient
     @Unroll
     def "detect Correct Translation #word1 to #word2 with #lang" (){
         when:
@@ -156,7 +149,6 @@ class TranslatorClientTest extends TranslatorSpec {
         'Bonjour'    | 'fr-en'      | 'Hello'
     }
 
-    //TODO переделать на translatorClient
     @Unroll
     def "detect correct translation #word1 to #lang" (){
         when:
@@ -171,7 +163,4 @@ class TranslatorClientTest extends TranslatorSpec {
         'Peach'         | en           | 'Peach'
         'untr4nsl4t4bl3'| en           | 'untr4nsl4t4bl3'
     }
-
-
-
 }

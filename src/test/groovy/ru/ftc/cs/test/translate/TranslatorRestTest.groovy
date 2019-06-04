@@ -40,7 +40,6 @@ class TranslatorRestTest extends TranslatorSpec {
         result.data.dirs.size() == 160
         result.data.langs.size() == 93
 
-        //TODO сделать так
         where:
         country << [ru.name(), 'russia']
     }
@@ -53,7 +52,6 @@ class TranslatorRestTest extends TranslatorSpec {
         then:
         result.data.lang == lang.name()
 
-        //TODO убрать лишнее
         where:
         word        | lang
         "Ананас"    | ru
