@@ -31,22 +31,18 @@ class TranslatorRestTest extends TranslatorSpec {
     }
 
     @Unroll
-    def "getLangs API"(){
+    def "getLangs API for #country"(){
         when:
-        def result = restClient.get([path: 'getLangs', query: [key: API_KEY, ui: ru.name()]])
+        def result = restClient.get([path: 'getLangs', query: [key: API_KEY, ui: country]])
 
         then:
         result.data.size() == 2
         result.data.dirs.size() == 160
         result.data.langs.size() == 93
 
-        when:
-        def result1 = restClient.get([path: 'getLangs', query: [key: API_KEY, ui: 'russia']])
-
-        then:
-        result1.data.size() == 2
-        result1.data.dirs.size() == 160
-        result1.data.langs.size() == 93
+        //TODO сделать так
+        where:
+        country << [ru.name(), 'russia']
     }
 
     @Unroll
@@ -55,17 +51,15 @@ class TranslatorRestTest extends TranslatorSpec {
         def result = restClient.get([path: 'detect', query: [key: API_KEY, text: word]])
 
         then:
-        result.data == [code:200, lang: lang?.name()]
+        result.data.lang == lang.name()
 
+        //TODO убрать лишнее
         where:
         word        | lang
-        "Ananas"    | en
         "Ананас"    | ru
         "Gut"       | de
-        "Petit"     | en
-        "Bongour"   | fr
-        "LLLL"      | es
-        "a1"        | en
+        "piña"      | es
+        "Bonjour"   | fr
     }
 
     @Unroll
@@ -79,6 +73,4 @@ class TranslatorRestTest extends TranslatorSpec {
         where:
         word << ["12", '.']
     }
-
-
 }

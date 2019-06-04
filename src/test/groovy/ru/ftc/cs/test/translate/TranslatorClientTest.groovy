@@ -53,9 +53,10 @@ class TranslatorClientTest extends TranslatorSpec {
         word  << ['a1', 'LLLL', 'sumword']
     }
 
-    def "limit check"(){
+    //TODO переделать на translatorClient
+    def "query limit check"(){
         when:
-        def result = restClient.get([path: 'translate', query: [key: API_KEY, lang: 'en-ru', text: word]])
+        translatorClient.call(translate, [lang: 'en-ru', text: word])
 
         then:
         HttpResponseException exception = thrown()
@@ -65,10 +66,11 @@ class TranslatorClientTest extends TranslatorSpec {
         word = 'This string is too long for translation' * 1000
     }
 
+    //TODO переделать на translatorClient и добавить переменную в название
     @Unroll
-    def "check 3 chars long lang format" (){
+    def "check 3 chars long lang format, lang: #lang" (){
         when:
-        def result = restClient.get([path: 'translate', query: [key: API_KEY, lang: lang, text: word]])
+        translatorClient.call(translate, [lang: lang, text: word])
 
         then:
         HttpResponseException exception = thrown()
@@ -82,10 +84,11 @@ class TranslatorClientTest extends TranslatorSpec {
         'Kurwa'     | 'pol'
     }
 
+    //TODO переделать на translatorClient
     @Unroll
     def "Check incorrect lang format #lang" (){
         when:
-        def result = restClient.get([path: 'translate', query: [key: API_KEY, lang: lang, text: word]])
+        translatorClient.call(translate, [lang: lang, text: word])
 
         then:
         HttpResponseException exception = thrown()
@@ -98,25 +101,27 @@ class TranslatorClientTest extends TranslatorSpec {
         'Person'    | 'en ru'
     }
 
+    //TODO переделать на translatorClient
     @Unroll
     def "detect Empty Lang for #word"(){
         when:
-        def result = restClient.get([path: 'detect', query: [key: API_KEY, text: word]])
+        def result = translatorClient.call(detect, [text: word])
 
         then:
-        result.data.lang == ""
+        result.lang == ""
 
         where:
         word << ["12", '.']
     }
 
+    //TODO переделать на translatorClient
     @Unroll
     def "detect Lang Succesfully for #word"(){
         when:
-        def result = restClient.get([path: 'detect', query: [key: API_KEY, text: word]])
+        def result = translatorClient.call(detect, [text: word])
 
         then:
-        result.data.lang != ''
+        result.lang != ''
 
         where:
         word << ['test', 'shevale','arbeit', 'n33t']
@@ -135,13 +140,14 @@ class TranslatorClientTest extends TranslatorSpec {
         'Howdy'     | az        | ba
     }
 
+    //TODO переделать на translatorClient
     @Unroll
     def "detect Correct Translation #word1 to #word2 with #lang" (){
         when:
-        def result = restClient.get([path: 'translate', query: [key: API_KEY, lang: lang, text: word1]])
+        def result = translatorClient.call(translate, [lang: lang, text: word1])
 
         then:
-        result.data.text[0] == word2
+        result.text[0] == word2
 
         where:
         word1        | lang         | word2
@@ -150,13 +156,14 @@ class TranslatorClientTest extends TranslatorSpec {
         'Bonjour'    | 'fr-en'      | 'Hello'
     }
 
+    //TODO переделать на translatorClient
     @Unroll
     def "detect correct translation #word1 to #lang" (){
         when:
-        def result = restClient.get([path: 'translate', query: [key: API_KEY, text: word1, lang: lang.name()]])
+        def result = translatorClient.call(translate, [text: word1, lang: lang.name()])
 
         then:
-        result.data.text[0] == word2
+        result.text[0] == word2
 
         where:
         word1           | lang         | word2
